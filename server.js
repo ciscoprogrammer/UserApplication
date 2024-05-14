@@ -4,6 +4,8 @@ const socketIo = require('socket.io');
 const app = express();
 const server = http.createServer(app); // Create HTTP server for socket.io
 const io = socketIo(server); // Attach socket.io to the server
+const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Environment variables
 const port = process.env.PORT || 3000;
@@ -25,12 +27,15 @@ io.on('connection', (socket) => {
     });
 });
 
-// Make io accessible in routes via req.app.locals.io
+//To  Make io accessible in routes via req.app.locals.io
 app.locals.io = io;
 
-// Import routes
+// To Import routes
 const webhookRoutes = require('./routes/webhookRoutes'); 
-app.use('/api', webhookRoutes); // Setup webhook routes
+app.use(webhookRoutes); // Setup webhook routes
+app.use('/admin',adminRoutes);
+app.use('/users', userRoutes);
+
 
 // Server setup to use the HTTP server instance
 server.listen(port, () => {
