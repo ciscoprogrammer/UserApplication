@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 
+
 // Setup nodemailer transporter
 const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE,
@@ -15,8 +16,20 @@ const transporter = nodemailer.createTransport({
 exports.registerUser = async (req, res) => {
     const { name, email, mobile, password } = req.body;
     const profileImage = req.file.path;  
+    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const mobileRegex = /^[6789]\d{9}$/;
+    
 
     try {
+        // Validate email
+        if (!emailRegex.test(email)) {
+            return res.status(400).send('Invalid email format');
+        }
+
+        // Validate mobile number
+        if (!mobileRegex.test(mobile)) {
+            return res.status(400).send('Invalid mobile number format');
+        }
         // Check if the user already exists
         let user = await User.findOne({ email });
         if (user) {
